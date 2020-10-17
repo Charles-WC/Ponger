@@ -29,7 +29,7 @@ class Ball(object):
         self.y = 0
 
     def draw(self):
-        pygame.draw.circle(self.screen, (227, 232, 41), (self.x, self.y), self.radius)
+        pygame.draw.circle(self.screen, (227, 232, 41), (int(self.x), int(self.y)), self.radius)
 
     def move(self, time_delta, direction=""):
 
@@ -96,10 +96,14 @@ while True:
             if event.key == pygame.K_SPACE:
                 ball.state = BALL_STATE_FIRING
 
+    # FIll up the background
     screen.fill((25, 25, 25))
 
-    if SCREEN_WIDTH - ball.radius >= ball.x >= 0:
-        ball.move(time_delta)
+    # Check the boundaries. Soon this will be with other sprites, not just the edge of the game
+    if ball.x <= 0:
+        ball.x_direction = DIRECTION_RIGHT
+    elif ball.x >= SCREEN_WIDTH - ball.radius:
+        ball.x_direction = DIRECTION_LEFT
 
     paddle.draw()
     ball.draw()
