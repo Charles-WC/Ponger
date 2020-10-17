@@ -5,6 +5,7 @@ from Ball import Ball
 from Const import *
 
 pygame.init()
+pygame.mixer.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pygame.time.Clock()
 
@@ -17,7 +18,7 @@ paddle.x = SCREEN_WIDTH / 2 - paddle.width / 2
 paddle.y = SCREEN_HEIGHT - (paddle.height * 2)
 
 # start at the center of the paddle
-ball = Ball(screen)
+ball = Ball(paddle)
 ball.x = paddle.x + (paddle.width / 2)
 ball.y = paddle.y - ball.radius
 
@@ -28,12 +29,12 @@ while True:
     events = pygame.event.get()
     for event in events:
         if event.type == pygame.QUIT:
-            SystemExit()
+            exit()
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 # Fire the ball
-                ball.state = BALL_STATE_MOVE
+                ball.fire()
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT] and paddle.x > 0:
@@ -44,19 +45,27 @@ while True:
     # FIll up the background
     screen.fill((25, 25, 25))
 
+    # Is the ball moving?
     if ball.state == BALL_STATE_MOVE:
-        # Check the boundaries for the ball. Soon this will be with other sprites, not just the edge of the game
+
+        # Check the x boundaries for the ball. Soon this will be with other sprites, not just the edge of the game
         if ball.x <= 0:
-            ball.x_direction = DIRECTION_RIGHT
+            ball.bounce(DIRECTION_RIGHT)
         elif ball.x >= SCREEN_WIDTH - ball.radius:
-            ball.x_direction = DIRECTION_LEFT
+            ball.bounce(DIRECTION_LEFT)
 
         # If the ball is off the map, send it back down. TODO: REPLACE WITH TILES
         if ball.y <= 0:
-            ball.y_direction = DIRECTION_DOWN
+            ball.bounce(DIRECTION_DOWN)
 
-        #  First, check to see if the bottom of the ball is the same as the top of the paddle.
-        if ball.y + ball.radius >= paddle.y:
+        # Check if we are off the screen
+        if ball.y >= SCREEN_HEIGHT:
+            # We need to take damage, and reset the ball
+            player.takeDamage(1)
+            ball.reset()
+
+        elif ball.y + ball.radius >= paddle.y:
+            #  First, check to see if the bottom of the ball is the same as the top of the paddle.
 
             #  If so, then check to see if the x of the ball is within in the x_width of the paddle
             if ball.x > paddle.x and ball.x < paddle.x + paddle.width:
@@ -71,4 +80,5 @@ while True:
     ball.move(time_delta)
     paddle.draw()
     ball.draw()
+    player.displayScore()
     pygame.display.update()
