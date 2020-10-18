@@ -24,10 +24,9 @@ paddle.y = SCREEN_HEIGHT - (paddle.height * 2)
 # start at the center of the paddle
 ball = Ball(paddle)
 
-
 while True:
 
-    time_delta = clock.tick(FRAME_RATE) / 1000
+    time_delta = clock.tick(FRAME_RATE) / 1000 * 2
 
     events = pygame.event.get()
     for event in events:
@@ -75,11 +74,11 @@ while True:
             #  If so, then check to see if the x of the ball is within in the x_width of the paddle
             if ball.x > paddle.x and ball.x < paddle.x + paddle.width:
                 # it is, so we need to reverse the course of the ball.
-                ball.bounce(DIRECTION_UP, False)
+                ball.bounce(DIRECTION_UP)
 
         if tiles.hasBallHitTile(ball):
+            ball.bounce(DIRECTION_DOWN)
             player.addScore(1)
-            ball.bounce(DIRECTION_DOWN, False)
 
     paddle.draw()
     ball.move(time_delta)

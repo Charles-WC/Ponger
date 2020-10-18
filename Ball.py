@@ -10,6 +10,7 @@ class Ball(pygame.sprite.Sprite):
         self.radius = 10
         self.rect = pygame.rect.Rect(paddle.x + (paddle.width / 2), paddle.y - self.radius, TILE_WIDTH, TILE_HEIGHT)
         self.screen = paddle.screen
+        self.speed = 10
         self.state = BALL_STATE_READY
         self.x = paddle.x + (paddle.width / 2)
         self.y = paddle.y - self.radius
