@@ -10,10 +10,6 @@ class Ball(pygame.sprite.Sprite):
         self.radius = 10
         self.rect = pygame.rect.Rect(paddle.x + (paddle.width / 2), paddle.y - self.radius, TILE_WIDTH, TILE_HEIGHT)
         self.screen = paddle.screen
-        self.sounds = {
-            SOUND_BOUNCE: pygame.mixer.Sound(SOUND_BOUNCE),
-            SOUND_STRIKE: pygame.mixer.Sound(SOUND_STRIKE)
-        }
         self.state = BALL_STATE_READY
         self.x = paddle.x + (paddle.width / 2)
         self.y = paddle.y - self.radius
@@ -22,7 +18,7 @@ class Ball(pygame.sprite.Sprite):
         self.x_delta = 400
         self.y_delta = 250
 
-    def bounce(self, direction, play_sound=True):
+    def bounce(self, direction):
 
         # Figure out which axis to change
         if direction in (DIRECTION_DOWN, DIRECTION_UP):
@@ -33,10 +29,6 @@ class Ball(pygame.sprite.Sprite):
         # And we need to change the deltas if we are going up
         if direction == DIRECTION_UP:
             self.x_delta = self.x - self.paddle.x
-
-        # Play the bounce sound
-        if play_sound:
-            self.play(SOUND_BOUNCE)
 
     def draw(self):
         self.rect = pygame.rect.Rect(int(self.x), int(self.y), TILE_WIDTH, TILE_HEIGHT)
@@ -63,10 +55,6 @@ class Ball(pygame.sprite.Sprite):
             self.y += time_delta * -self.y_delta
         else:
             self.y += time_delta * self.y_delta
-
-    def play(self, sound):
-        if sound in self.sounds:
-            self.sounds[sound].play()
 
     def reset(self):
         """ This will recenter the ball on the paddle"""

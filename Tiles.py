@@ -4,13 +4,22 @@ from Const import *
 
 class Tiles(pygame.sprite.Group):
 
-    def __init__(self, screen, *sprites):
+    def __init__(self, screen):
 
-        super().__init__(*sprites)
+        super().__init__()
         self.screen = screen
         self.tiles = []
         self.tile_image = pygame.image.load("res/tile.png")
         self.populate()
+
+    def hasBallHitTile(self, ball):
+
+        for tile in self.sprites():
+            if pygame.sprite.collide_rect(ball, tile):
+                self.remove(tile)
+                return True
+        
+        return False
 
     def populate(self):
 

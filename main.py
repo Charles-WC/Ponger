@@ -66,7 +66,7 @@ while True:
         elif ball.y >= SCREEN_HEIGHT:
 
             # We need to take damage, and reset the ball
-            player.score(-1)
+            player.takeLife()
             ball.reset()
 
         # Check to see if the ball is hitting the paddle
@@ -77,8 +77,8 @@ while True:
                 # it is, so we need to reverse the course of the ball.
                 ball.bounce(DIRECTION_UP, False)
 
-        for collision in pygame.sprite.spritecollide(ball, tiles, True):
-            player.score(1)
+        if tiles.hasBallHitTile(ball):
+            player.addScore(1)
             ball.bounce(DIRECTION_DOWN, False)
 
     paddle.draw()
