@@ -2,6 +2,7 @@ import pygame
 from Player import Player
 from Paddle import Paddle
 from Ball import Ball
+from Tiles import Tiles, Tile
 from Const import *
 
 pygame.init()
@@ -12,6 +13,9 @@ clock = pygame.time.Clock()
 # create the player
 player = Player(screen)
 
+# create the tiles
+tiles = Tiles(screen)
+
 # create the paddle
 paddle = Paddle(screen)
 paddle.x = SCREEN_WIDTH / 2 - paddle.width / 2
@@ -19,8 +23,7 @@ paddle.y = SCREEN_HEIGHT - (paddle.height * 2)
 
 # start at the center of the paddle
 ball = Ball(paddle)
-ball.x = paddle.x + (paddle.width / 2)
-ball.y = paddle.y - ball.radius
+
 
 while True:
 
@@ -48,37 +51,40 @@ while True:
     # Is the ball moving?
     if ball.state == BALL_STATE_MOVE:
 
-        # Check the x boundaries for the ball. Soon this will be with other sprites, not just the edge of the game
+        # Check the x boundaries for the ball
         if ball.x <= 0:
             ball.bounce(DIRECTION_RIGHT)
         elif ball.x >= SCREEN_WIDTH - ball.radius:
             ball.bounce(DIRECTION_LEFT)
 
-        # If the ball is off the map, send it back down. TODO: REPLACE WITH TILES
+        # Check the Y boundaries of the ball
+        # If the ball is off the map, send it back down.
         if ball.y <= 0:
             ball.bounce(DIRECTION_DOWN)
 
         # Check if we are off the screen
-        if ball.y >= SCREEN_HEIGHT:
+        elif ball.y >= SCREEN_HEIGHT:
+
             # We need to take damage, and reset the ball
-            player.takeDamage(1)
+            player.score(-1)
             ball.reset()
 
+        # Check to see if the ball is hitting the paddle
         elif ball.y + ball.radius >= paddle.y:
-            #  First, check to see if the bottom of the ball is the same as the top of the paddle.
 
             #  If so, then check to see if the x of the ball is within in the x_width of the paddle
             if ball.x > paddle.x and ball.x < paddle.x + paddle.width:
-
                 # it is, so we need to reverse the course of the ball.
-                ball.y_direction = DIRECTION_UP
+                ball.bounce(DIRECTION_UP, False)
 
-                # and we need to figure out the right degree in which to bounce, and adjust the X and Y speeds accordingly
-                x_axis = ball.x - paddle.x
-                ball.x_speed = x_axis
+        for collision in pygame.sprite.spritecollide(ball, tiles, True):
+            player.score(1)
+            ball.bounce(DIRECTION_DOWN, False)
 
-    ball.move(time_delta)
     paddle.draw()
+    ball.move(time_delta)
     ball.draw()
+    tiles.draw(screen)
+
     player.displayScore()
     pygame.display.update()

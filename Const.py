@@ -18,7 +18,10 @@ DIRECTION_DOWN = "down"
 FRAME_RATE = 60
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 800
+TILE_HEIGHT = 25
+TILE_WIDTH = 100
 
+# Sounds
 SOUND_BOUNCE = "res/bounce.wav"
 SOUND_DAMAGE = "res/damage.wav"
 SOUND_STRIKE = "res/strike.wav"

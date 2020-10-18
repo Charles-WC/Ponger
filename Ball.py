@@ -1,26 +1,28 @@
 import pygame
 from Const import *
 
-class Ball(object):
+class Ball(pygame.sprite.Sprite):
 
     def __init__(self, paddle):
 
+        super().__init__()
         self.paddle = paddle
         self.radius = 10
+        self.rect = pygame.rect.Rect(paddle.x + (paddle.width / 2), paddle.y - self.radius, TILE_WIDTH, TILE_HEIGHT)
         self.screen = paddle.screen
         self.sounds = {
             SOUND_BOUNCE: pygame.mixer.Sound(SOUND_BOUNCE),
             SOUND_STRIKE: pygame.mixer.Sound(SOUND_STRIKE)
         }
         self.state = BALL_STATE_READY
-        self.x = 0
-        self.y = 0
+        self.x = paddle.x + (paddle.width / 2)
+        self.y = paddle.y - self.radius
         self.x_direction = DIRECTION_NONE
         self.y_direction = DIRECTION_UP
-        self.x_speed = 400
-        self.y_speed = 250
+        self.x_delta = 400
+        self.y_delta = 250
 
-    def bounce(self, direction):
+    def bounce(self, direction, play_sound=True):
 
         # Figure out which axis to change
         if direction in (DIRECTION_DOWN, DIRECTION_UP):
@@ -28,14 +30,16 @@ class Ball(object):
         else:
             self.x_direction = direction
 
-        # Play the bounce sound
-        self.playSound(SOUND_BOUNCE)
+        # And we need to change the deltas if we are going up
+        if direction == DIRECTION_UP:
+            self.x_delta = self.x - self.paddle.x
 
-    def playSound(self, sound):
-        if sound in self.sounds:
-            self.sounds[sound].play()
+        # Play the bounce sound
+        if play_sound:
+            self.play(SOUND_BOUNCE)
 
     def draw(self):
+        self.rect = pygame.rect.Rect(int(self.x), int(self.y), TILE_WIDTH, TILE_HEIGHT)
         pygame.draw.circle(self.screen, BALL_COLOR, (int(self.x), int(self.y)), self.radius)
 
     def fire(self):
@@ -48,18 +52,21 @@ class Ball(object):
         if self.state is not BALL_STATE_MOVE:
             return None
 
+        # Let's move the X Direction
         if self.x_direction == DIRECTION_LEFT:
-            pixels_to_move_x = -self.x_speed
+            self.x += time_delta * -self.x_delta
         else:
-            pixels_to_move_x = self.x_speed
+            self.x += time_delta * self.x_delta
 
+        # And now move the y direction
         if self.y_direction == DIRECTION_UP:
-            pixels_to_move_y = -self.y_speed
+            self.y += time_delta * -self.y_delta
         else:
-            pixels_to_move_y = self.y_speed
+            self.y += time_delta * self.y_delta
 
-        self.x += time_delta * pixels_to_move_x
-        self.y += time_delta * pixels_to_move_y
+    def play(self, sound):
+        if sound in self.sounds:
+            self.sounds[sound].play()
 
     def reset(self):
         """ This will recenter the ball on the paddle"""

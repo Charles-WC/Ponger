@@ -6,6 +6,7 @@ class Player(object):
     def __init__(self, screen):
 
         self.lives = 3  # Always start with three lives
+        self.points = 0  # Always start with three lives
         self.screen = screen
         self.sounds = {
             SOUND_DAMAGE: pygame.mixer.Sound(SOUND_DAMAGE),
@@ -13,14 +14,14 @@ class Player(object):
 
     def displayScore(self):
         font = pygame.font.SysFont("sans", 20)
-        text = font.render(f"Lives: {self.lives}", True, (0, 128, 0))
-        self.screen.blit(text, (10, 10))
+        text = font.render(f"Lives: {self.lives} Score: {self.points}", True, (225, 0, 0))
+        self.screen.blit(text, (10, SCREEN_HEIGHT - 20))
 
-    def playSound(self, sound):
+    def play(self, sound):
         if sound in self.sounds:
             self.sounds[sound].play()
 
-    def takeDamage(self, amount):
-        self.lives -= amount
-        self.playSound(SOUND_DAMAGE)
+    def score(self, amount):
+        self.points += amount
+        self.play(SOUND_DAMAGE)
 
